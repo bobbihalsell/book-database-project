@@ -46,11 +46,33 @@ def clean_price(price_str):
     except ValueError:
         input('''
         \n ****** PRICE ERROR ******
-        \r the price formal should look like 12.99
+        \r the price format should look like 12.99
         \r press enter to try again
         \r**************************''')
         return
     return return_price
+
+
+def clean_id(id_str, options):
+    try:
+        book_id=int(id_str)
+    except ValueError:
+        input('''
+        \n ******* ID ERROR *******
+        \r the ID format should be a number
+        \r press enter to try again
+        \r**************************''')
+        return
+    else: 
+        if book_id in options:
+            return book_id
+        else:
+            input(f'''
+        \n ******* ID ERROR *******
+        \r Options: {options} 
+        \r press enter to try again
+        \r**************************''')
+            return
 
 
 
@@ -99,7 +121,24 @@ def app():
                 print(f'{book.id} | {book.title} | {book.author} | {book.date_published} | {book.price}')
             input('Press enter to return to menu')
         elif choice == '3':
-            pass
+            id_options = []
+            for book in session.query(Book):
+                id_options.append(book.id)
+            id_error = True
+            while id_error:
+                id_choice = input(f'''
+                    \n id options: {id_options}
+                    \r Choose a Book:  ''')
+                id_choice = clean_id(id_choice, id_options)
+                if type(id_choice) == int:
+                    id_error = False
+            the_book = session.query(Book).filter(Book.id == id_choice).first()
+            print(f'''
+                \n{the_book.title} by {the_book.author}
+                \r Published in {the_book.date_published}
+                \r Price: {the_book.price/100}''')
+            input('Press enter to return to menu')
+
         elif choice == '4':
             pass
         else:
