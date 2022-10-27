@@ -20,6 +20,39 @@ def menu():
                     \rHit enter to try again.''')
 
 
+def submenu():
+    while True:
+        print('''
+              \nPROGRAMMING BOOKS
+              \r1) Edit
+              \r2) Delete
+              \r3) Return to menu''')
+        choice = input('What would you like to do?  ')
+        if choice in ['1', '2', '3']:
+            return choice
+        else: input('''
+                    \nPlease choose one of the options above.
+                    \rHit enter to try again.''')
+
+
+def editmenu():
+    while True:
+        print(f'''
+                \nSelect which you would like to edit:
+                \r1) Title
+                \r2) Author
+                \r3) Price
+                \r4) Publish date
+                \r5) Return to menu''')
+        ed_choice = input('What would you like to do?  ')
+        if ed_choice in ['1', '2', '3', '4', '5']:
+            return ed_choice
+        else: input('''
+                    \nPlease choose one of the options above.
+                    \rHit enter to try again.''')
+
+
+
 def clean_date(date_str):
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     split_date = date_str.split(' ')
@@ -74,6 +107,46 @@ def clean_id(id_str, options):
         \r**************************''')
             return
 
+
+def edit(book, edit_choice): 
+    if edit_choice == '1':
+        if book.title == None:
+            print(f'Currently this book has no title')
+        else:
+            print(f'Current Title: {book.title}')
+        new_title = input('What would you like to change the title to?  ')
+        return new_title
+    elif edit_choice == '2':
+        if book.author == None:
+            print(f'Currently this book has no author')
+        else:
+            print(f'Current Author: {book.author}')
+        new_author = input('What would you like to change the price to?  ')
+        return new_author
+    elif edit_choice == '3':
+        if book.price == None:
+            print(f'Currently this book has no price')
+        else:
+            print(f'Current price: {book.price/100}')
+        new_price_error=True
+        while new_price_error:
+            new_price = input('What would you like to change the price to?  ')
+            new_price=clean_price(new_price)
+            if type(new_price) == int:
+                new_price_error=False
+        return new_price
+    elif edit_choice == '4':
+        if book.price == None:
+            print(f'Currently this book has no price')
+        else:
+            print(f'Current date: {book.date_published.strftime("%B %d, %Y")}')
+        new_date_error=True
+        while new_date_error: 
+            new_date = input('What would you like to change the published date to? (ex October 25, 2017)  ')
+            new_date=clean_date(new_date)
+            if type(new_date) ==  datetime.date:
+                new_date_error=False
+        return new_date
 
 
 def add_csv():
@@ -136,9 +209,33 @@ def app():
             print(f'''
                 \n{the_book.title} by {the_book.author}
                 \r Published in {the_book.date_published}
-                \r Price: {the_book.price/100}''')
-            input('Press enter to return to menu')
-
+                \r Price: {the_book.price}''')
+            subchoice = submenu()
+            if subchoice == '1':
+                edit_choice = editmenu()
+                if edit_choice == '1':
+                    the_book.title = edit(the_book, '1')
+                    print(f'The Title has been updated to {the_book.title}')
+                elif edit_choice == '2':
+                    the_book.author = edit(the_book, '2')
+                    print(f'Author of {the_book.title} has been updated to {the_book.author}')
+                elif edit_choice == '3':
+                    the_book.price = edit(the_book, '3')
+                    print(f'Price of {the_book.title} has been updated to {the_book.price}')
+                elif edit_choice == '4':
+                    the_book.date_published = edit(the_book, '4')
+                    print(f'Publish date of {the_book.title} has been updated to {the_book.date_published.strftime("%B %d, %Y")}')
+                session.commit()
+                time.sleep(1.5)
+            elif subchoice == '2':
+                sure = input(f'''
+                                \n Are you sure you want to delete {the_book.title}? 
+                                \rtype Y to confirm ''')
+                if sure == 'Y':
+                    session.delete(the_book)
+                    session.commit()
+                    print('BOOK DELETED')
+                    time.sleep(1.5)
         elif choice == '4':
             pass
         else:
@@ -150,5 +247,9 @@ def app():
 if __name__=='__main__':
     Base.metadata.create_all(engine)
     app()
-    add_csv()
+    # add_csv()
+    # edit(session.query(Book).filter(Book.id == '4').first(), '1')
+    # p=(clean_price(21.24))
+    # print(p)
+  
     
