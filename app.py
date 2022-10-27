@@ -237,7 +237,17 @@ def app():
                     print('BOOK DELETED')
                     time.sleep(1.5)
         elif choice == '4':
-            pass
+            oldest_book = session.query(Book).order_by(Book.date_published).first()
+            newest_book = session.query(Book).order_by(Book.date_published.desc()).first()
+            total_books = session.query(Book).count()
+            python_books = session.query(Book).filter(Book.title.like('%python%')).count()
+            print(f'''
+                    \n Oldest book: {oldest_book.title}
+                    \r Newest book: {newest_book.title}
+                    \r There are {total_books} books total
+                    \r There are {python_books} python books
+                    ''')
+            input('Press enter to return to menu ')
         else:
             print('GOODBYE')
             app_running=False 
@@ -248,8 +258,6 @@ if __name__=='__main__':
     Base.metadata.create_all(engine)
     app()
     # add_csv()
-    # edit(session.query(Book).filter(Book.id == '4').first(), '1')
-    # p=(clean_price(21.24))
-    # print(p)
+
   
     
